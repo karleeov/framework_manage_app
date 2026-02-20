@@ -1,7 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="32" fill="#0d1117"/>
-  <rect x="32" y="32" width="192" height="192" rx="16" fill="#21262d" stroke="#58a6ff" stroke-width="4"/>
-  <path d="M64 80 L128 48 L192 80 L192 176 L128 208 L64 176 Z" fill="none" stroke="#58a6ff" stroke-width="8"/>
-  <circle cx="128" cy="128" r="32" fill="#58a6ff"/>
-  <path d="M128 96 L128 160 M96 128 L160 128" stroke="#0d1117" stroke-width="8" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="256" height="256" rx="32" fill="url(#bgGrad)"/>
+  
+  <!-- Gear shape -->
+  <g transform="translate(128,128)">
+    <circle r="70" fill="none" stroke="#e94560" stroke-width="8"/>
+    <g stroke="#e94560" stroke-width="14" stroke-linecap="round">
+      <line x1="0" y1="-85" x2="0" y2="-65"/>
+      <line x1="0" y1="85" x2="0" y2="65"/>
+      <line x1="-85" y1="0" x2="-65" y2="0"/>
+      <line x1="85" y1="0" x2="65" y2="0"/>
+      <line x1="-60" y1="-60" x2="-46" y2="-46"/>
+      <line x1="60" y1="60" x2="46" y2="46"/>
+      <line x1="-60" y1="60" x2="-46" y2="46"/>
+      <line x1="60" y1="-60" x2="46" y2="-46"/>
+    </g>
+  </g>
+  
+  <!-- Inner circle -->
+  <circle cx="128" cy="128" r="45" fill="#0f3460" stroke="#e94560" stroke-width="4"/>
+  
+  <!-- CPU chip -->
+  <rect x="108" y="108" width="40" height="40" rx="4" fill="#e94560"/>
+  <rect x="114" y="114" width="8" height="8" fill="#1a1a2e"/>
+  <rect x="134" y="114" width="8" height="8" fill="#1a1a2e"/>
+  <rect x="114" y="134" width="8" height="8" fill="#1a1a2e"/>
+  <rect x="134" y="134" width="8" height="8" fill="#1a1a2e"/>
+  
+  <!-- Lightning bolt -->
+  <path d="M145 90 L118 118 L132 118 L120 148 L150 115 L136 115 Z" fill="#e94560" stroke="#1a1a2e" stroke-width="2" stroke-linejoin="round"/>
 </svg>
