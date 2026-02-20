@@ -917,6 +917,7 @@ setInterval(async () => {
 
 hw.init().then(() => {
   server.listen(PORT, () => {
+    console.log('SERVER_READY');
     console.log(`
 ╔═══════════════════════════════════════════════╗
 ║     Framework Control Web Portal              ║
