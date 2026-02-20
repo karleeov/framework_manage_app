@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Framework Control</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --border: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent: #58a6ff;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.disconnected {
+      background: var(--danger);
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-value {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .card-unit {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Temperature gauge */
+    .temp-gauge {
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .temp-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    .temp-fill.cool { background: var(--success); }
+    .temp-fill.warm { background: var(--warning); }
+    .temp-fill.hot { background: var(--danger); }
+
+    /* Control Panel */
+    .control-group {
+      margin-bottom: 24px;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .control-label span {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .control-label strong {
+      color: var(--accent);
+    }
+
+    /* Slider */
+    .slider-container {
+      position: relative;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--border);
+    }
+
+    .btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    /* Power Mode Buttons */
+    .power-mode-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .power-mode-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .power-mode-btn:hover {
+      background: var(--border);
+    }
+
+    .power-mode-btn.active {
+      border-color: var(--accent);
+      background: rgba(88, 166, 255, 0.1);
+    }
+
+    .power-mode-btn .icon {
+      font-size: 1.2rem;
+    }
+
+    .power-mode-btn.battery-saver .icon { color: #3fb950; }
+    .power-mode-btn.balanced .icon { color: #58a6ff; }
+    .power-mode-btn.max .icon { color: #f85149; }
+
+    /* Toggle */
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-container:last-child {
+      border-bottom: none;
+    }
+
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      background: var(--bg-tertiary);
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle.active {
+      background: var(--accent);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle.active::after {
+      transform: translateX(22px);
+    }
+
+    /* Sensor grid */
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .sensor-item {
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+    }
+
+    .sensor-item .label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .sensor-item .value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Fan curve editor */
+    .fan-curve {
+      height: 150px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      margin-top: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fan-curve canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sensor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+          <path d="M9 9h6M9 12h6M9 15h3"/>
+        </svg>
+        <h1>Framework Control</h1>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connected</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- CPU Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">CPU Temperature</span>
+        </div>
+        <div class="card-value" id="cpuTemp">--</div>
+        <span class="card-unit">Celsius</span>
+        <div class="temp-gauge">
+          <div class="temp-fill cool" id="cpuTempFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- CPU Load Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">CPU Load</span>
+        </div>
+        <div class="card-value" id="cpuLoad">--</div>
+        <span class="card-unit">Percent</span>
+        <div class="temp-gauge">
+          <div class="temp-fill" id="cpuLoadFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- TDP Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Power Draw</span>
+        </div>
+        <div class="card-value"><span id="tdpCurrent">--</span> / <span id="tdpLimit">45</span></div>
+        <span class="card-unit">Watts (Current / Limit)</span>
+      </div>
+
+      <!-- Battery Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Battery</span>
+        </div>
+        <div class="card-value" id="batteryPercent">--</div>
+        <span class="card-unit" id="batteryStatus">Not charging</span>
+      </div>
+
+      <!-- TDP Control -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Power Mode</span>
+        </div>
+        <div class="power-mode-buttons">
+          <button class="power-mode-btn battery-saver" data-mode="battery-saver">
+            <span class="icon">&#128267;</span>
+            <span>Battery Saver</span>
+          </button>
+          <button class="power-mode-btn balanced active" data-mode="balanced">
+            <span class="icon">&#9878;</span>
+            <span>Balanced</span>
+          </button>
+          <button class="power-mode-btn max" data-mode="max">
+            <span class="icon">&#9889;</span>
+            <span>Max Performance</span>
+          </button>
+        </div>
+        <div class="control-group">
+          <div class="control-label">
+            <span>Power Limit</span>
+            <strong id="tdpValue">45W</strong>
+          </div>
+          <input type="range" id="tdpSlider" min="5" max="65" value="45">
+        </div>
+      </div>
+
+      <!-- Fan Control -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Fan Profile</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" data-profile="silent">Silent</button>
+          <button class="btn active" data-profile="balanced">Balanced</button>
+          <button class="btn" data-profile="performance">Performance</button>
+        </div>
+        <div class="fan-curve">
+          <canvas id="fanCurveCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Battery Settings -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Battery Settings</span>
+        </div>
+        <div class="control-group">
+          <div class="control-label">
+            <span>Charge Limit</span>
+            <strong id="batteryLimitValue">100%</strong>
+          </div>
+          <input type="range" id="batteryLimitSlider" min="20" max="100" value="100">
+        </div>
+      </div>
+
+      <!-- System Info -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">System</span>
+        </div>
+        <div class="sensor-grid">
+          <div class="sensor-item">
+            <div class="label">Memory Used</div>
+            <div class="value" id="memUsed">--</div>
+          </div>
+          <div class="sensor-item">
+            <div class="label">Memory Total</div>
+            <div class="value" id="memTotal">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let ws = null;
+    let sensors = {};
+
+    // Elements
+    const elements = {
+      statusDot: document.getElementById('statusDot'),
+      statusText: document.getElementById('statusText'),
+      cpuTemp: document.getElementById('cpuTemp'),
+      cpuTempFill: document.getElementById('cpuTempFill'),
+      cpuLoad: document.getElementById('cpuLoad'),
+      cpuLoadFill: document.getElementById('cpuLoadFill'),
+      tdpCurrent: document.getElementById('tdpCurrent'),
+      tdpLimit: document.getElementById('tdpLimit'),
+      batteryPercent: document.getElementById('batteryPercent'),
+      batteryStatus: document.getElementById('batteryStatus'),
+      tdpSlider: document.getElementById('tdpSlider'),
+      tdpValue: document.getElementById('tdpValue'),
+      batteryLimitSlider: document.getElementById('batteryLimitSlider'),
+      batteryLimitValue: document.getElementById('batteryLimitValue'),
+      memUsed: document.getElementById('memUsed'),
+      memTotal: document.getElementById('memTotal'),
+      fanCurveCanvas: document.getElementById('fanCurveCanvas'),
+    };
+
+    // WebSocket connection
+    function connect() {
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${location.host}`);
+
+      ws.onopen = () => {
+        elements.statusDot.classList.remove('disconnected');
+        elements.statusText.textContent = 'Connected';
+      };
+
+      ws.onclose = () => {
+        elements.statusDot.classList.add('disconnected');
+        elements.statusText.textContent = 'Disconnected';
+        setTimeout(connect, 3000);
+      };
+
+      ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'sensors') {
+          updateUI(msg.data);
+        }
+      };
+    }
+
+    // Update UI with sensor data
+    function updateUI(data) {
+      sensors = data;
+
+      // CPU Temp
+      const temp = Math.round(data.cpu?.temperature || 0);
+      elements.cpuTemp.textContent = temp;
+      const tempPercent = Math.min((temp / 100) * 100, 100);
+      elements.cpuTempFill.style.width = `${tempPercent}%`;
+      elements.cpuTempFill.className = 'temp-fill ' + getTempClass(temp);
+
+      // CPU Load
+      const load = Math.round(data.cpu?.load || 0);
+      elements.cpuLoad.textContent = `${load}%`;
+      elements.cpuLoadFill.style.width = `${load}%`;
+      elements.cpuLoadFill.className = 'temp-fill ' + getLoadClass(load);
+
+      // TDP
+      elements.tdpCurrent.textContent = data.power?.tdpCurrent || '--';
+      elements.tdpLimit.textContent = data.power?.tdpLimit || 45;
+
+      // Battery
+      elements.batteryPercent.textContent = `${data.battery?.percent || '--'}%`;
+      elements.batteryStatus.textContent = data.battery?.isCharging ? 'Charging' : 'Not charging';
+
+      // Memory
+      elements.memUsed.textContent = formatBytes(data.memory?.used);
+      elements.memTotal.textContent = formatBytes(data.memory?.total);
+
+      // Update controls to match current settings
+      if (data.settings) {
+        elements.tdpSlider.value = data.settings.tdpLimit;
+        elements.tdpValue.textContent = `${data.settings.tdpLimit}W`;
+        
+        // Update power mode buttons
+        const currentMode = data.settings.powerMode || 'balanced';
+        document.querySelectorAll('[data-mode]').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.mode === currentMode);
+        });
+
+        // Update fan profile buttons
+        const currentProfile = data.settings.fanProfile || 'balanced';
+        document.querySelectorAll('[data-profile]').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.profile === currentProfile);
+        });
+      }
+    }
+
+    function getTempClass(temp) {
+      if (temp < 50) return 'cool';
+      if (temp < 75) return 'warm';
+      return 'hot';
+    }
+
+    function getLoadClass(load) {
+      if (load < 30) return 'cool';
+      if (load < 70) return 'warm';
+      return 'hot';
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '--';
+      const gb = bytes / (1024 * 1024 * 1024);
+      return `${gb.toFixed(1)} GB`;
+    }
+
+    // Controls
+    elements.tdpSlider.addEventListener('input', async (e) => {
+      const value = e.target.value;
+      elements.tdpValue.textContent = `${value}W`;
+    });
+
+    elements.tdpSlider.addEventListener('change', async (e) => {
+      const value = parseInt(e.target.value);
+      await fetch('/api/tdp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ watts: value }),
+      });
+    });
+
+    elements.batteryLimitSlider.addEventListener('input', (e) => {
+      elements.batteryLimitValue.textContent = `${e.target.value}%`;
+    });
+
+    elements.batteryLimitSlider.addEventListener('change', async (e) => {
+      await fetch('/api/battery-limit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ percent: parseInt(e.target.value) }),
+      });
+    });
+
+    // Fan profile buttons
+    document.querySelectorAll('[data-profile]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('[data-profile]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        await fetch('/api/fan-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile: btn.dataset.profile }),
+        });
+      });
+    });
+
+    // Power mode buttons
+    document.querySelectorAll('[data-mode]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const mode = btn.dataset.mode;
+        
+        await fetch('/api/power-mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode }),
+        });
+      });
+    });
+
+    // Draw fan curve
+    function drawFanCurve() {
+      const canvas = elements.fanCurveCanvas;
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      // Draw grid
+      ctx.strokeStyle = '#30363d';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = (i / 4) * canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw curve
+      const curve = [
+        { temp: 30, speed: 20 },
+        { temp: 50, speed: 35 },
+        { temp: 70, speed: 60 },
+        { temp: 85, speed: 85 },
+        { temp: 95, speed: 100 },
+      ];
+
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      curve.forEach((point, i) => {
+        const x = ((point.temp - 20) / 80) * canvas.width;
+        const y = canvas.height - (point.speed / 100) * canvas.height;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+
+      ctx.stroke();
+
+      // Draw points
+      ctx.fillStyle = '#58a6ff';
+      curve.forEach(point => {
+        const x = ((point.temp - 20) / 80) * canvas.width;
+        const y = canvas.height - (point.speed / 100) * canvas.height;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    // Initialize
+    connect();
+    drawFanCurve();
+    window.addEventListener('resize', drawFanCurve);
+  </script>
+</body>
+</html>
