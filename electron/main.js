@@ -1,7 +1,6 @@
 import { app, BrowserWindow, Tray, Menu, nativeImage, shell } from 'electron';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
-import { fork } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -9,45 +8,40 @@ const __dirname = dirname(__filename);
 const PORT = 3838;
 let mainWindow = null;
 let tray = null;
-let serverProcess = null;
+let serverStarted = false;
 
 // Check if running from packaged app
 const isPackaged = app.isPackaged;
 const appPath = isPackaged ? dirname(app.getPath('exe')) : join(__dirname, '..');
 
-// Start the backend server
-function startServer() {
-  return new Promise((resolve, reject) => {
+// Start the backend server by importing it directly
+async function startServer() {
+  try {
+    // In packaged app, files are in app directory
     const serverPath = isPackaged
-      ? join(process.resourcesPath, 'server', 'index.js')
+      ? join(app.getAppPath(), 'server', 'index.js')
       : join(__dirname, '..', 'server', 'index.js');
 
     console.log('Starting server from:', serverPath);
+    console.log('isPackaged:', isPackaged);
+    console.log('app.getAppPath():', app.getAppPath());
 
-    serverProcess = fork(serverPath, [], {
-      env: { ...process.env, PORT: PORT.toString() },
-      stdio: ['pipe', 'pipe', 'pipe', 'ipc']
-    });
+    // Set PORT before importing
+    process.env.PORT = PORT.toString();
 
-    serverProcess.stdout.on('data', (data) => {
-      console.log(`Server: ${data}`);
-      if (data.toString().includes('Open in browser')) {
-        resolve();
-      }
-    });
+    // Import the server module directly - this runs it in the same process
+    // On Windows, we need to use a file:// URL for dynamic import
+    const serverUrl = pathToFileURL(serverPath).href;
+    await import(serverUrl);
+    serverStarted = true;
+    console.log('Server started successfully');
 
-    serverProcess.stderr.on('data', (data) => {
-      console.error(`Server Error: ${data}`);
-    });
-
-    serverProcess.on('error', (err) => {
-      console.error('Failed to start server:', err);
-      reject(err);
-    });
-
-    // Timeout fallback
-    setTimeout(resolve, 3000);
-  });
+    // Give the server a moment to bind to the port
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    throw err;
+  }
 }
 
 // Create system tray
@@ -165,10 +159,7 @@ app.on('activate', () => {
 // Cleanup on quit
 app.on('before-quit', () => {
   app.isQuitting = true;
-
-  if (serverProcess) {
-    serverProcess.kill();
-  }
+  // Server runs in main process, no need to kill separately
 });
 
 // Handle single instance
